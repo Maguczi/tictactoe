@@ -1,48 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import './Game.scss'
 import Square from '../Components/Square/Square.js'
 
-const game = () => {
-    const [type, setType] = useState(2);
-    const [state00, setState00] = useState(0);
-    const [state01, setState01] = useState(0);
-    const [state02, setState02] = useState(0);
-    const [state10, setState10] = useState(0);
-    const [state11, setState11] = useState(0);
-    const [state12, setState12] = useState(0);
-    const [state20, setState20] = useState(0);
-    const [state21, setState21] = useState(0);
-    const [state22, setState22] = useState(0);
+let type = 2
 
-    const setTypeHandler = () => {
-        if (type === 1) {
-            setType(2);
-        } else {
-            setType(1);
-        }
+const game = () => {
+  const startMap = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+  const [map, setMap] = useState(startMap)
+
+  const clickHandler = (w, h) => {
+    if (map[w][h]) {
+      return
     }
 
+    map[w][h] = type = type === 2 ? 1 : 2
+
+    setMap(map)
+
+    const winner = calculateWinner(map)
+    if (winner) {
+      setTimeout(() => {
+        alert('Winner: ' + (winner === 1 ? 'X' : 'O'))
+
+        setTimeout(() => {
+          newGame()
+        }, 500)
+      }, 400)
+    }
+  }
+
+  const newGame = () => {
+    setMap(startMap)
+  }
+
+  const renderSquare = (w, h) => {
     return (
-        <div className="game">
-            <div className="line horizontal-line horizontal-line-1"></div>
-            <div className="line horizontal-line horizontal-line-2"></div>
+      <Square
+        key={w + '' + h}
+        state={map[w][h]}
+        name={'b' + w + h}
+        click={() => {
+          clickHandler(w, h)
+        }}
+      />
+    )
+  }
 
-            <div className="line vertical-line vertical-line-1"></div>
-            <div className="line vertical-line vertical-line-2"></div>
+  const renderSquares = () => {
+    let squares = []
 
-            <Square name="b00" state={state00} click={() => {setTypeHandler(); setState00(type)}} />
-            <Square name="b01" state={state01} click={() => {setTypeHandler(); setState01(type)}} />
-            <Square name="b02" state={state02} click={() => {setTypeHandler(); setState02(type)}} />
+    for (let w = 0; w < 3; w++) {
+      for (let h = 0; h < 3; h++) {
+        squares.push(renderSquare(w, h))
+      }
+    }
 
-            <Square name="b10" state={state10} click={() => {setTypeHandler(); setState10(type)}} />
-            <Square name="b11" state={state11} click={() => {setTypeHandler(); setState11(type)}} />
-            <Square name="b12" state={state12} click={() => {setTypeHandler(); setState12(type)}} />
+    return squares
+  }
 
-            <Square name="b20" state={state20} click={() => {setTypeHandler(); setState20(type)}} />
-            <Square name="b21" state={state21} click={() => {setTypeHandler(); setState21(type)}} />
-            <Square name="b22" state={state22} click={() => {setTypeHandler(); setState22(type)}} />
-        </div>
-    );
+  return (
+    <div className="game">
+      <div className="line horizontal-line horizontal-line-1" />
+      <div className="line horizontal-line horizontal-line-2" />
+
+      <div className="line vertical-line vertical-line-1" />
+      <div className="line vertical-line vertical-line-2" />
+
+      {renderSquares()}
+    </div>
+  )
 }
 
-export default game;
+export default game
+
+function calculateWinner(map) {
+  const lines = [
+    /* var */
+    [[0, 0], [0, 1], [0, 2]],
+    [[1, 0], [1, 1], [1, 2]],
+    [[2, 0], [2, 1], [2, 2]],
+    // /* hori */
+    [[0, 0], [1, 0], [2, 0]],
+    [[0, 1], [1, 1], [2, 1]],
+    [[0, 2], [1, 2], [2, 2]],
+    /* cross */
+    [[0, 0], [1, 1], [2, 2]],
+    [[0, 2], [1, 1], [2, 0]]
+  ]
+
+  for (let i = 0; i < lines.length; i++) {
+    const status = []
+
+    for (let j = 0; j < lines[i].length; j++) {
+      const [w, h] = lines[i][j]
+      status.push(map[w][h])
+    }
+
+    const [a, b, c] = status
+
+    if (a && a === b && a === c) {
+      return a
+    }
+  }
+
+  return false
+}

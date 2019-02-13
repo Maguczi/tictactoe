@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import './App.scss';
+import React, { Component } from 'react'
+import './App.scss'
 
 // import Home from './Home/Home'
 import Game from './Game/Game'
@@ -10,8 +10,8 @@ class App extends Component {
       <div className="App">
         <Game />
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App
